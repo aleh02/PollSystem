@@ -38,7 +38,7 @@ public class VoteServiceImpl implements VoteService {
 
     @Override
     public VoteResponse getVote(Long pollId, AuthPrincipal me) {
-        if(!pollRepository.existsById(pollId))
+        if (!pollRepository.existsById(pollId))
             throw new NotFoundException("poll not found");
 
         Vote vote = voteRepository.findByPollIdAndUserId(pollId, me.userId())
@@ -50,21 +50,19 @@ public class VoteServiceImpl implements VoteService {
     @Transactional
     @Override
     public PollOptionResponse upsertVote(Long pollId, Long optionId, AuthPrincipal me) {
-        //CAS
-        int cas = pollRepository.casVoteAllowed(pollId);
-
-        if(cas == 0){
-            if(!pollRepository.existsById(pollId))
-                throw new NotFoundException("poll not found");
-            throw new BadRequestException("poll expired");
-        }
+        if (!pollRepository.existsById(pollId))
+            throw new NotFoundException("poll not found");
 
         Long ownerId = pollRepository.findOwnerId(pollId);
-        if(ownerId != null && ownerId.equals(me.userId()))
+        if (ownerId != null && ownerId.equals(me.userId()))
             throw new UnauthorizedOperationException("owner cannot vote");
 
-        if(!pollOptionRepository.existsByIdAndPollId(optionId, pollId))
+        if (!pollOptionRepository.existsByIdAndPollId(optionId, pollId))
             throw new NotFoundException("option not found in this poll");
+
+        //CAS
+        int cas = pollRepository.casVoteAllowed(pollId);
+        if (cas == 0) throw new BadRequestException("poll expired");
 
         //UPSERT
         voteRepository.upsertVote(pollId, me.userId(), optionId);
