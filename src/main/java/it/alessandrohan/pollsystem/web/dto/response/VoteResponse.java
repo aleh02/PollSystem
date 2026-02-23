@@ -9,7 +9,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class VoteResponse {
 
-    private Long optionId;
+    private String optionId;
 
     private Long id;
 

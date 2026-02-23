@@ -8,7 +8,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface VoteMapper {
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "vote.pollOption.id", target = "optionId")
+    @Mapping(source = "pollOption.id", target = "optionId")
     VoteResponse voteToVoteResponse(Vote vote);
+
+    default String map(Long value) {
+        return value == null ? null : value.toString();
+    }
 }
