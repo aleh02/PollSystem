@@ -6,6 +6,8 @@ import it.alessandrohan.pollsystem.web.dto.response.PollOptionResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface PollOptionMapper {
 
@@ -13,4 +15,6 @@ public interface PollOptionMapper {
 
     @Mapping(source = "id", target = "id")
     PollOptionResponse pollOptionToPollOptionResponse(PollOption pollOption);
+
+    List<PollOptionResponse> pollOptionListToPollOptionResponseList(List<PollOption> options);
 }

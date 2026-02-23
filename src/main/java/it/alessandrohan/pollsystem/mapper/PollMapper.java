@@ -2,6 +2,7 @@ package it.alessandrohan.pollsystem.mapper;
 
 import it.alessandrohan.pollsystem.model.Poll;
 import it.alessandrohan.pollsystem.web.dto.request.PollCreateRequest;
+import it.alessandrohan.pollsystem.web.dto.response.PollDetailsResponse;
 import it.alessandrohan.pollsystem.web.dto.response.PollResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,4 +18,9 @@ public interface PollMapper {
     List<PollResponse> pollListToPollResponseList(List<Poll> polls);
 
     Poll pollCreateReqToPoll(PollCreateRequest request);
+
+    @Mapping(target = "owner", source = "owner.username")
+    @Mapping(target = "winner", ignore = true)
+    @Mapping(target = "options", ignore = true)
+    PollDetailsResponse polltoPollDetailsResponse(Poll poll);
 }

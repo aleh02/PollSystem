@@ -32,4 +32,5 @@ public interface PollRepository extends JpaRepository<Poll, Long> {
         WHERE id = :pollId
     """, nativeQuery = true)
     Long findOwnerId(@Param("pollId") Long pollId);
+
 }

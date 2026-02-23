@@ -4,6 +4,7 @@ import it.alessandrohan.pollsystem.service.PollService;
 import it.alessandrohan.pollsystem.security.AuthPrincipal;
 import it.alessandrohan.pollsystem.web.dto.request.PollCreateRequest;
 import it.alessandrohan.pollsystem.web.dto.request.PollUpdateRequest;
+import it.alessandrohan.pollsystem.web.dto.response.PollDetailsResponse;
 import it.alessandrohan.pollsystem.web.dto.response.PollListPageResponse;
 import it.alessandrohan.pollsystem.web.dto.response.PollResponse;
 import jakarta.validation.Valid;
@@ -59,5 +60,11 @@ public class PollController {
                            @AuthenticationPrincipal AuthPrincipal me
     ) {
         pollService.deletePoll(id, me);
+    }
+
+    @GetMapping("/polls-details/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public PollDetailsResponse getPollDetails(@PathVariable Long id) {
+        return pollService.getPollDetails(id);
     }
 }

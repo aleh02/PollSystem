@@ -2,6 +2,7 @@ package it.alessandrohan.pollsystem.service;
 
 import it.alessandrohan.pollsystem.web.dto.request.PollCreateRequest;
 import it.alessandrohan.pollsystem.web.dto.request.PollUpdateRequest;
+import it.alessandrohan.pollsystem.web.dto.response.PollDetailsResponse;
 import it.alessandrohan.pollsystem.web.dto.response.PollListPageResponse;
 import it.alessandrohan.pollsystem.web.dto.response.PollResponse;
 import it.alessandrohan.pollsystem.security.AuthPrincipal;
@@ -16,4 +17,6 @@ public interface PollService {
     PollResponse updatePoll(Long id, AuthPrincipal me, PollUpdateRequest request);
 
     void deletePoll(Long id, AuthPrincipal me);
+
+    PollDetailsResponse getPollDetails(Long pollId);
 }

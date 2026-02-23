@@ -1,20 +1,22 @@
 package it.alessandrohan.pollsystem.service;
 
 import it.alessandrohan.pollsystem.mapper.PollMapper;
+import it.alessandrohan.pollsystem.mapper.PollOptionMapper;
 import it.alessandrohan.pollsystem.model.Poll;
+import it.alessandrohan.pollsystem.model.PollOption;
 import it.alessandrohan.pollsystem.model.PollStatus;
 import it.alessandrohan.pollsystem.model.User;
+import it.alessandrohan.pollsystem.repository.PollOptionRepository;
 import it.alessandrohan.pollsystem.repository.PollRepository;
 import it.alessandrohan.pollsystem.repository.UserRepository;
 import it.alessandrohan.pollsystem.repository.VoteRepository;
 import it.alessandrohan.pollsystem.security.AuthPrincipal;
 import it.alessandrohan.pollsystem.web.dto.request.PollCreateRequest;
 import it.alessandrohan.pollsystem.web.dto.request.PollUpdateRequest;
+import it.alessandrohan.pollsystem.web.dto.response.*;
 import it.alessandrohan.pollsystem.web.exception.BadRequestException;
 import it.alessandrohan.pollsystem.web.exception.UnauthorizedOperationException;
 import it.alessandrohan.pollsystem.web.exception.NotFoundException;
-import it.alessandrohan.pollsystem.web.dto.response.PollListPageResponse;
-import it.alessandrohan.pollsystem.web.dto.response.PollResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class PollServiceImpl implements PollService {
@@ -38,6 +41,12 @@ public class PollServiceImpl implements PollService {
 
     @Autowired
     private PollMapper pollMapper;
+
+    @Autowired
+    private PollOptionRepository pollOptionRepository;
+
+    @Autowired
+    private PollOptionMapper pollOptionMapper;
 
     @Override
     public PollListPageResponse getPolls(int page, int size, String search) {
@@ -95,7 +104,7 @@ public class PollServiceImpl implements PollService {
         Poll poll = pollRepository.findWithOwnerById(id)
                 .orElseThrow(() -> new NotFoundException("poll not found"));
 
-        if(!poll.getOwner().getId().equals(me.userId()))
+        if (!poll.getOwner().getId().equals(me.userId()))
             throw new UnauthorizedOperationException("unauthorized");
 
         Instant now = Instant.now();
@@ -103,7 +112,7 @@ public class PollServiceImpl implements PollService {
             throw new BadRequestException("poll expired");
         }
 
-        if(voteRepository.existsByPollId(id)) throw new BadRequestException("unable to modify voted polls");
+        if (voteRepository.existsByPollId(id)) throw new BadRequestException("unable to modify voted polls");
 
         if (request.getQuestion() != null) poll.setQuestion(request.getQuestion());
         if (request.getExpiresAt() != null) {
@@ -122,9 +131,34 @@ public class PollServiceImpl implements PollService {
         Poll poll = pollRepository.findWithOwnerById(id)
                 .orElseThrow(() -> new NotFoundException("poll not found"));
 
-        if(!poll.getOwner().getId().equals(me.userId()))
+        if (!poll.getOwner().getId().equals(me.userId()))
             throw new UnauthorizedOperationException("unauthorized");
 
         pollRepository.delete(poll);
+    }
+
+    @Override
+    public PollDetailsResponse getPollDetails(Long pollId) {
+        Poll poll = pollRepository.findWithOwnerById(pollId)
+                .orElseThrow(() -> new NotFoundException("poll not found"));
+
+        PollDetailsResponse response = pollMapper.polltoPollDetailsResponse(poll);
+        List<PollOption> options = pollOptionRepository.findAllByPollId(pollId);
+        response.setOptions(pollOptionMapper.pollOptionListToPollOptionResponseList(options));
+
+        if (poll.getStatus() == PollStatus.EXPIRED
+                && poll.getWinnerOption() != null
+                && poll.getWinnerPercent() != null
+        ) {
+            response.setWinner(new WinnerOptionResponse(
+                    poll.getId(),
+                    poll.getWinnerOption().getId(),
+                    poll.getWinnerPercent()
+            ));
+        } else {
+            response.setWinner(null);
+        }
+
+        return response;
     }
 }
