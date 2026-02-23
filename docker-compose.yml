@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: poll-postgres
+    environment:
+      POSTGRES_DB: poll_system
+      POSTGRES_USER: poll_user
+      POSTGRES_PASSWORD: poll_pass
+      TZ: Europe/Rome
+    ports:
+      - "5434:5432"
+    volumes:
+      - poll_pgdata:/var/lib/postgresql/data
+
+volumes:
+  poll_pgdata:

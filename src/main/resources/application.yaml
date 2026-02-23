@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: pollsystem
+
+  datasource:
+    url: jdbc:postgresql://localhost:5434/poll_system
+    username: poll_user
+    password: poll_pass
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: public
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    schemas: public
+    default-schema: public
+    locations: classpath:db/migration
+
+app:
+  jwt:
+    secret: "MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUY="
