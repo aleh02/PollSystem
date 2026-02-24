@@ -22,6 +22,16 @@ spring:
     default-schema: public
     locations: classpath:db/migration
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
 app:
   jwt:
     secret: "MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUY="
+    expiration-minutes: 30
+
+  queue:
+    poll-winner-mail: poll.winner.mail

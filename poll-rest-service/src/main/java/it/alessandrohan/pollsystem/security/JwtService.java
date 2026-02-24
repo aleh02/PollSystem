@@ -10,21 +10,24 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.Date;
 
 @Service
 public class JwtService {
-    private final String secretKey;
+    private final byte[] secretKeyBytes;
+    private final long jwtExpirationMs;
 
-    private static final long jwtExpirationMs = 1000 * 60 * 30;
-
-    public JwtService(@Value("${app.jwt.secret}") String secretKey) {
-        this.secretKey = secretKey;
+    public JwtService(
+            @Value("${app.jwt.secret}") String secretKey,
+            @Value("${app.jwt.expiration-minutes}") long expirationMinutes
+    ) {
+        this.secretKeyBytes = Base64.getDecoder().decode(secretKey);
+        this.jwtExpirationMs = expirationMinutes * 60_000;
     }
 
     private SecretKey getKey() {
-        byte[] keyBytes = secretKey.getBytes();
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(secretKeyBytes);
     }
 
     public LoginResponse generateToken(User user) {

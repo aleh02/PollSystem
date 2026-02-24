@@ -25,10 +25,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
 public class PollServiceImpl implements PollService {
+    private static final ZoneId BUSINESS_ZONE = ZoneId.of("Europe/Rome");
 
     @Autowired
     private PollRepository pollRepository;
@@ -70,7 +73,8 @@ public class PollServiceImpl implements PollService {
     @Override
     public PollResponse createPoll(AuthPrincipal me, PollCreateRequest request) {
         Instant now = Instant.now();
-        if (request.getExpiresAt().isBefore(now)) { //400
+        Instant normalizedExpiresAt = normalizeToNextMidnightBusinessZone(request.getExpiresAt());
+        if (!normalizedExpiresAt.isAfter(now)) {
             throw new IllegalArgumentException("expiresAt must be in the future");
         }
 
@@ -79,6 +83,7 @@ public class PollServiceImpl implements PollService {
 
         Poll poll = pollMapper.pollCreateReqToPoll(request);
         poll.setOwner(owner);
+        poll.setExpiresAt(normalizedExpiresAt);
         poll.setStatus(PollStatus.ACTIVE);
         poll.setWinnerOption(null);
         poll.setWinnerPercent(null);
@@ -116,10 +121,11 @@ public class PollServiceImpl implements PollService {
 
         if (request.getQuestion() != null) poll.setQuestion(request.getQuestion());
         if (request.getExpiresAt() != null) {
-            if (!request.getExpiresAt().isAfter(now)) {
+            Instant normalizedExpiresAt = normalizeToNextMidnightBusinessZone(request.getExpiresAt());
+            if (!normalizedExpiresAt.isAfter(now)) {
                 throw new IllegalArgumentException("expiresAt must be in the future");
             }
-            poll.setExpiresAt(request.getExpiresAt());
+            poll.setExpiresAt(normalizedExpiresAt);
         }
         Poll savedPoll = pollRepository.save(poll);
 
@@ -160,5 +166,13 @@ public class PollServiceImpl implements PollService {
         }
 
         return response;
+    }
+
+    private Instant normalizeToNextMidnightBusinessZone(Instant expiresAtInput) {
+        LocalDate expiresDateInBusinessZone = expiresAtInput.atZone(BUSINESS_ZONE).toLocalDate();
+        return expiresDateInBusinessZone
+                .plusDays(1)
+                .atStartOfDay(BUSINESS_ZONE)
+                .toInstant();
     }
 }
