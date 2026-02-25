@@ -26,5 +26,8 @@
     password: guest
 
 app:
+  batch:
+    limit: 200
+
   queue:
     poll-winner-mail: poll.winner.mail

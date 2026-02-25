@@ -9,7 +9,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -44,4 +43,7 @@ public class Poll extends BaseEntity {
 
     @Column(name = "winner_percent", precision = 5, scale = 2)
     private BigDecimal winnerPercent;
+
+    @Column(name = "winner_notified_at")
+    private Instant winnerNotifiedAt;
 }

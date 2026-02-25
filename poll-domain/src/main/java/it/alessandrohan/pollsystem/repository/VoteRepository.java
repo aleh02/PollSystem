@@ -29,4 +29,6 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     void upsertVote(@Param("pollId") Long pollId,
                     @Param("userId") Long userId,
                     @Param("optionId") Long optionId);
+
+    long countByPollId(Long pollId);
 }
