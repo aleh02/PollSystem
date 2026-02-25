@@ -8,7 +8,6 @@ import it.alessandrohan.pollsystem.web.dto.response.PollDetailsResponse;
 import it.alessandrohan.pollsystem.web.dto.response.PollListPageResponse;
 import it.alessandrohan.pollsystem.web.dto.response.PollResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +17,11 @@ import org.springframework.web.bind.annotation.*;
 public class PollController {
     public static final String BASE_URL = "/rest/api/v0";
 
-    @Autowired
-    private PollService pollService;
+    private final PollService pollService;
+
+    public PollController(PollService pollService) {
+        this.pollService = pollService;
+    }
 
     @GetMapping("/polls")
     @ResponseStatus(HttpStatus.OK)

@@ -3,7 +3,6 @@ package it.alessandrohan.pollsystem.security;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,11 +15,13 @@ import java.util.ArrayList;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final AuthEntryPoint authEntryPoint;
 
-    @Autowired
-    private AuthEntryPoint authEntryPoint;
+    public JwtFilter(JwtService jwtService, AuthEntryPoint authEntryPoint) {
+        this.jwtService = jwtService;
+        this.authEntryPoint = authEntryPoint;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

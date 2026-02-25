@@ -8,7 +8,6 @@ import it.alessandrohan.pollsystem.web.dto.request.LoginRequest;
 import it.alessandrohan.pollsystem.web.dto.request.RegistrationRequest;
 import it.alessandrohan.pollsystem.web.dto.response.LoginResponse;
 import it.alessandrohan.pollsystem.web.exception.DuplicateResourceException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,17 +15,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
+    private final JwtService jwtService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private JwtService jwtService;
+    public AuthServiceImpl(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            UserMapper userMapper,
+            JwtService jwtService
+    ) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
+        this.jwtService = jwtService;
+    }
 
     @Override
     public void registerUser(RegistrationRequest request) {

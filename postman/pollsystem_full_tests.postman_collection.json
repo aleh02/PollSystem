@@ -1,0 +1,416 @@
+﻿  {
+  "info": {
+    "_postman_id": "2e3dbfab-89b4-45a2-a9c2-9d6b4f8e8a10",
+    "name": "Poll System - Full Tests",
+    "description": "Complete test flow for Poll System APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/rest/api/v0" },
+    { "key": "ownerUsername", "value": "owner1" },
+    { "key": "ownerPassword", "value": "Password1" },
+    { "key": "ownerEmail", "value": "owner1@test.com" },
+    { "key": "voterUsername", "value": "voter1" },
+    { "key": "voterPassword", "value": "Password1" },
+    { "key": "voterEmail", "value": "voter1@test.com" },
+    { "key": "ownerToken", "value": "" },
+    { "key": "voterToken", "value": "" },
+    { "key": "pollId", "value": "" },
+    { "key": "optionAId", "value": "" },
+    { "key": "optionBId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "01 - Register Owner",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/registration",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"{{ownerUsername}}\",\"password\":\"{{ownerPassword}}\",\"email\":\"{{ownerEmail}}\"}"
+            }
+          }
+        },
+        {
+          "name": "02 - Register Voter",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/registration",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"{{voterUsername}}\",\"password\":\"{{voterPassword}}\",\"email\":\"{{voterEmail}}\"}"
+            }
+          }
+        },
+        {
+          "name": "03 - Register Duplicate Owner (expect error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/registration",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"{{ownerUsername}}\",\"password\":\"{{ownerPassword}}\",\"email\":\"{{ownerEmail}}\"}"
+            }
+          }
+        },
+        {
+          "name": "04 - Login Owner",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"{{ownerUsername}}\",\"password\":\"{{ownerPassword}}\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "if (json.token) pm.collectionVariables.set('ownerToken', json.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 - Login Voter",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"{{voterUsername}}\",\"password\":\"{{voterPassword}}\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "if (json.token) pm.collectionVariables.set('voterToken', json.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 - Login Wrong Password (expect 401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"{{ownerUsername}}\",\"password\":\"WrongPass1\"}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Poll",
+      "item": [
+        {
+          "name": "07 - Create Poll (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ownerToken}}" }
+            ],
+            "url": "{{baseUrl}}/polls",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"question\":\"Chi vince il derby?\",\"expiresAt\":\"2026-03-05T10:00:00Z\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('pollId', String(json.id));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 - Create Poll Without Token (expect 401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/polls",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"question\":\"No auth poll\",\"expiresAt\":\"2026-03-05T10:00:00Z\"}"
+            }
+          }
+        },
+        {
+          "name": "09 - Get Polls",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ownerToken}}" }],
+            "url": "{{baseUrl}}/polls?page=0&size=10"
+          }
+        },
+        {
+          "name": "10 - Get Poll By ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ownerToken}}" }],
+            "url": "{{baseUrl}}/polls/{{pollId}}"
+          }
+        },
+        {
+          "name": "11 - Get Poll Not Found (expect 404)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ownerToken}}" }],
+            "url": "{{baseUrl}}/polls/999999"
+          }
+        },
+        {
+          "name": "12 - Update Poll (Owner)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ownerToken}}" }
+            ],
+            "url": "{{baseUrl}}/polls/{{pollId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"question\":\"Chi vince il derby di Milano?\",\"expiresAt\":\"2026-03-06T10:00:00Z\"}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Options",
+      "item": [
+        {
+          "name": "13 - Create Option A (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ownerToken}}" }
+            ],
+            "url": "{{baseUrl}}/polls/{{pollId}}/options",
+            "body": { "mode": "raw", "raw": "{\"message\":\"Inter\"}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('optionAId', String(json.id));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "14 - Create Option B (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ownerToken}}" }
+            ],
+            "url": "{{baseUrl}}/polls/{{pollId}}/options",
+            "body": { "mode": "raw", "raw": "{\"message\":\"Milan\"}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('optionBId', String(json.id));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "15 - Create Option as Voter (expect unauthorized)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{voterToken}}" }
+            ],
+            "url": "{{baseUrl}}/polls/{{pollId}}/options",
+            "body": { "mode": "raw", "raw": "{\"message\":\"Juve\"}" }
+          }
+        },
+        {
+          "name": "16 - Get Option By ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ownerToken}}" }],
+            "url": "{{baseUrl}}/polls/{{pollId}}/options/{{optionAId}}"
+          }
+        },
+        {
+          "name": "17 - Update Option A Before Votes",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ownerToken}}" }
+            ],
+            "url": "{{baseUrl}}/polls/{{pollId}}/options/{{optionAId}}",
+            "body": { "mode": "raw", "raw": "{\"message\":\"Inter FC\"}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Votes",
+      "item": [
+        {
+          "name": "18 - Vote Option A (Voter)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{voterToken}}" }],
+            "url": "{{baseUrl}}/polls/{{pollId}}/options/{{optionAId}}/vote"
+          }
+        },
+        {
+          "name": "19 - Get My Vote",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{voterToken}}" }],
+            "url": "{{baseUrl}}/polls/{{pollId}}/vote"
+          }
+        },
+        {
+          "name": "20 - Change Vote to Option B",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{voterToken}}" }],
+            "url": "{{baseUrl}}/polls/{{pollId}}/options/{{optionBId}}/vote"
+          }
+        },
+        {
+          "name": "21 - Get My Vote After Change",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{voterToken}}" }],
+            "url": "{{baseUrl}}/polls/{{pollId}}/vote"
+          }
+        },
+        {
+          "name": "22 - Owner Cannot Vote (expect unauthorized)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ownerToken}}" }],
+            "url": "{{baseUrl}}/polls/{{pollId}}/options/{{optionAId}}/vote"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Post-vote Rules",
+      "item": [
+        {
+          "name": "23 - Update Poll After Votes (expect 400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ownerToken}}" }
+            ],
+            "url": "{{baseUrl}}/polls/{{pollId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"question\":\"Should fail\",\"expiresAt\":\"2026-03-07T10:00:00Z\"}"
+            }
+          }
+        },
+        {
+          "name": "24 - Update Voted Option (expect 400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ownerToken}}" }
+            ],
+            "url": "{{baseUrl}}/polls/{{pollId}}/options/{{optionBId}}",
+            "body": { "mode": "raw", "raw": "{\"message\":\"Should fail\"}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "25 - Delete Voted Option (expect 400)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ownerToken}}" }],
+            "url": "{{baseUrl}}/polls/{{pollId}}/options/{{optionBId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Details",
+      "item": [
+        {
+          "name": "26 - Poll Details",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ownerToken}}" }],
+            "url": "{{baseUrl}}/polls-details/{{pollId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

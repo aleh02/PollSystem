@@ -5,7 +5,6 @@ import it.alessandrohan.pollsystem.web.dto.request.LoginRequest;
 import it.alessandrohan.pollsystem.web.dto.request.RegistrationRequest;
 import it.alessandrohan.pollsystem.web.dto.response.LoginResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +13,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     public static final String BASE_URL = "/rest/api/v0";
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)

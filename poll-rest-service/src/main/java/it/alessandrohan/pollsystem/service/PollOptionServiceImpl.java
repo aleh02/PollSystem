@@ -14,7 +14,6 @@ import it.alessandrohan.pollsystem.web.dto.response.PollOptionResponse;
 import it.alessandrohan.pollsystem.web.exception.BadRequestException;
 import it.alessandrohan.pollsystem.web.exception.UnauthorizedOperationException;
 import it.alessandrohan.pollsystem.web.exception.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,17 +21,22 @@ import java.time.Instant;
 @Service
 public class PollOptionServiceImpl implements PollOptionService {
 
-    @Autowired
-    private PollRepository pollRepository;
+    private final PollRepository pollRepository;
+    private final PollOptionRepository pollOptionRepository;
+    private final VoteRepository voteRepository;
+    private final PollOptionMapper pollOptionMapper;
 
-    @Autowired
-    private PollOptionRepository pollOptionRepository;
-
-    @Autowired
-    private VoteRepository voteRepository;
-
-    @Autowired
-    private PollOptionMapper pollOptionMapper;
+    public PollOptionServiceImpl(
+            PollRepository pollRepository,
+            PollOptionRepository pollOptionRepository,
+            VoteRepository voteRepository,
+            PollOptionMapper pollOptionMapper
+    ) {
+        this.pollRepository = pollRepository;
+        this.pollOptionRepository = pollOptionRepository;
+        this.voteRepository = voteRepository;
+        this.pollOptionMapper = pollOptionMapper;
+    }
 
     @Override
     public PollOptionResponse createPollOption(Long pollId, AuthPrincipal me, PollOptionCreateRequest request) {

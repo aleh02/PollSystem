@@ -1,0 +1,23 @@
+package it.alessandrohan.pollsystem.batch;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/internal/batch")
+public class BatchDebugController {
+
+    private final PollBatchScheduler pollBatchScheduler;
+
+    public BatchDebugController(PollBatchScheduler pollBatchScheduler) {
+        this.pollBatchScheduler = pollBatchScheduler;
+    }
+
+    @PostMapping("/run-now")
+    public ResponseEntity<Void> runNow() {
+        pollBatchScheduler.runNow();
+        return ResponseEntity.accepted().build();
+    }
+}

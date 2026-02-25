@@ -14,27 +14,31 @@ import it.alessandrohan.pollsystem.web.dto.response.VoteResponse;
 import it.alessandrohan.pollsystem.web.exception.BadRequestException;
 import it.alessandrohan.pollsystem.web.exception.NotFoundException;
 import it.alessandrohan.pollsystem.web.exception.UnauthorizedOperationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class VoteServiceImpl implements VoteService {
 
-    @Autowired
-    private PollRepository pollRepository;
+    private final PollRepository pollRepository;
+    private final PollOptionRepository pollOptionRepository;
+    private final VoteRepository voteRepository;
+    private final VoteMapper voteMapper;
+    private final PollOptionMapper pollOptionMapper;
 
-    @Autowired
-    private PollOptionRepository pollOptionRepository;
-
-    @Autowired
-    private VoteRepository voteRepository;
-
-    @Autowired
-    private VoteMapper voteMapper;
-
-    @Autowired
-    private PollOptionMapper pollOptionMapper;
+    public VoteServiceImpl(
+            PollRepository pollRepository,
+            PollOptionRepository pollOptionRepository,
+            VoteRepository voteRepository,
+            VoteMapper voteMapper,
+            PollOptionMapper pollOptionMapper
+    ) {
+        this.pollRepository = pollRepository;
+        this.pollOptionRepository = pollOptionRepository;
+        this.voteRepository = voteRepository;
+        this.voteMapper = voteMapper;
+        this.pollOptionMapper = pollOptionMapper;
+    }
 
     @Override
     public VoteResponse getVote(Long pollId, AuthPrincipal me) {

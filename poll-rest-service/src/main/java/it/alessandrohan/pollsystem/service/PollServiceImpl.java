@@ -17,7 +17,6 @@ import it.alessandrohan.pollsystem.web.dto.response.*;
 import it.alessandrohan.pollsystem.web.exception.BadRequestException;
 import it.alessandrohan.pollsystem.web.exception.UnauthorizedOperationException;
 import it.alessandrohan.pollsystem.web.exception.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,23 +32,28 @@ import java.util.List;
 public class PollServiceImpl implements PollService {
     private static final ZoneId BUSINESS_ZONE = ZoneId.of("Europe/Rome");
 
-    @Autowired
-    private PollRepository pollRepository;
+    private final PollRepository pollRepository;
+    private final UserRepository userRepository;
+    private final VoteRepository voteRepository;
+    private final PollMapper pollMapper;
+    private final PollOptionRepository pollOptionRepository;
+    private final PollOptionMapper pollOptionMapper;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private VoteRepository voteRepository;
-
-    @Autowired
-    private PollMapper pollMapper;
-
-    @Autowired
-    private PollOptionRepository pollOptionRepository;
-
-    @Autowired
-    private PollOptionMapper pollOptionMapper;
+    public PollServiceImpl(
+            PollRepository pollRepository,
+            UserRepository userRepository,
+            VoteRepository voteRepository,
+            PollMapper pollMapper,
+            PollOptionRepository pollOptionRepository,
+            PollOptionMapper pollOptionMapper
+    ) {
+        this.pollRepository = pollRepository;
+        this.userRepository = userRepository;
+        this.voteRepository = voteRepository;
+        this.pollMapper = pollMapper;
+        this.pollOptionRepository = pollOptionRepository;
+        this.pollOptionMapper = pollOptionMapper;
+    }
 
     @Override
     public PollListPageResponse getPolls(int page, int size, String search) {

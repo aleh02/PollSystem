@@ -6,7 +6,6 @@ import it.alessandrohan.pollsystem.web.dto.request.PollOptionCreateRequest;
 import it.alessandrohan.pollsystem.web.dto.request.PollOptionUpdateRequest;
 import it.alessandrohan.pollsystem.web.dto.response.PollOptionResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +15,11 @@ import org.springframework.web.bind.annotation.*;
 public class PollOptionController {
     public static final String BASE_URL = "/rest/api/v0/polls";
 
-    @Autowired
-    private PollOptionService pollOptionService;
+    private final PollOptionService pollOptionService;
+
+    public PollOptionController(PollOptionService pollOptionService) {
+        this.pollOptionService = pollOptionService;
+    }
 
     @PostMapping("/{id}/options")
     @ResponseStatus(HttpStatus.CREATED)

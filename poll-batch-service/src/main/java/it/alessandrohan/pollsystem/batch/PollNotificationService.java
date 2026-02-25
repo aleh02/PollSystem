@@ -3,9 +3,10 @@ package it.alessandrohan.pollsystem.batch;
 import it.alessandrohan.pollsystem.messaging.WinnerMessage;
 import it.alessandrohan.pollsystem.model.Poll;
 import it.alessandrohan.pollsystem.repository.PollRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -14,36 +15,51 @@ import java.util.List;
 @Service
 public class PollNotificationService {
 
-    @Autowired
-    private PollRepository pollRepository;
+    private static final Logger log = LoggerFactory.getLogger(PollNotificationService.class);
 
-    @Autowired
-    private WinnerMailProducer winnerMailProducer;
+    private final PollRepository pollRepository;
+    private final WinnerMailProducer winnerMailProducer;
+    private final TransactionTemplate transactionTemplate;
 
-    public void notifyExpiredPolls(int limit) {
+    public PollNotificationService(
+            PollRepository pollRepository,
+            WinnerMailProducer winnerMailProducer,
+            TransactionTemplate transactionTemplate
+    ) {
+        this.pollRepository = pollRepository;
+        this.winnerMailProducer = winnerMailProducer;
+        this.transactionTemplate = transactionTemplate;
+    }
+
+    public int notifyExpiredPolls(int limit) {
         int effectiveLimit = Math.max(1, limit);
+        int notifiedCount = 0;
 
         while (true) {
             List<Long> pollIds = pollRepository.findExpiredNotNotifiedPollIds(effectiveLimit);
-            if(pollIds.isEmpty()) return;
+            if (pollIds.isEmpty()) return notifiedCount;
 
-            for(Long pollId : pollIds) {
-                notifyOne(pollId);
+            for (Long pollId : pollIds) {
+                try {
+                    notifiedCount += notifyOne(pollId);
+                } catch (Exception ex) {
+                    //keeps processing if one publish fails.
+                    log.error("Failed to notify winner for poll {}", pollId, ex);
+                }
             }
 
-            if(pollIds.size() < effectiveLimit) return;
+            if (pollIds.size() < effectiveLimit) return notifiedCount;
         }
     }
 
-    @Transactional
     protected void markNotified(Long pollId) {
-        pollRepository.markWinnerNotified(pollId);
+        transactionTemplate.executeWithoutResult(status -> pollRepository.markWinnerNotified(pollId));
     }
 
-    private void notifyOne(Long pollId) {
+    private int notifyOne(Long pollId) {
         Poll poll = pollRepository.findWithOwnerAndWinnerOptionById(pollId)
                 .orElse(null);
-        if(poll == null || poll.getWinnerNotifiedAt() != null) return;
+        if (poll == null || poll.getWinnerNotifiedAt() != null) return 0;
 
         LocalDate expiredAt = poll.getExpiresAt()
                 .atZone(ZoneId.of("Europe/Rome"))
@@ -60,5 +76,6 @@ public class PollNotificationService {
 
         winnerMailProducer.send(msg);
         markNotified(pollId);   //only if publish success
+        return 1;
     }
 }

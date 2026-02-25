@@ -4,7 +4,6 @@ import it.alessandrohan.pollsystem.security.AuthPrincipal;
 import it.alessandrohan.pollsystem.service.VoteService;
 import it.alessandrohan.pollsystem.web.dto.response.PollOptionResponse;
 import it.alessandrohan.pollsystem.web.dto.response.VoteResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +13,11 @@ import org.springframework.web.bind.annotation.*;
 public class VoteController {
     public static final String BASE_URL = "/rest/api/v0/polls";
 
-    @Autowired
-    private VoteService voteService;
+    private final VoteService voteService;
+
+    public VoteController(VoteService voteService) {
+        this.voteService = voteService;
+    }
 
     @GetMapping("/{id}/vote")
     @ResponseStatus(HttpStatus.OK)
