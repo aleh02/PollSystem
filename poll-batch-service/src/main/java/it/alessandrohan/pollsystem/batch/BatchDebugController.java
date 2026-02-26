@@ -1,10 +1,12 @@
 package it.alessandrohan.pollsystem.batch;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Profile("local")
 @RestController
 @RequestMapping("/internal/batch")
 public class BatchDebugController {
