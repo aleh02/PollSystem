@@ -1,6 +1,6 @@
 # Poll System
 
-Spring multi-module project for the Poll System exercise.
+Spring multi-module platform for creating, voting, and managing polls with scheduled winner notification workflows.
 
 ## Overview
 
