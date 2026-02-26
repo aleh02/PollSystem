@@ -16,7 +16,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @Table(name = "polls",
         indexes = {
-            @Index(name = "idx_polls_status_expires_at", columnList = "status, expires_at")
+            @Index(name = "idx_polls_status_expires_at", columnList = "status, expires_at"),
+            @Index(name = "idx_polls_status_winner_notified_at", columnList = "status, winner_notified_at")
         })
 public class Poll extends BaseEntity {
 

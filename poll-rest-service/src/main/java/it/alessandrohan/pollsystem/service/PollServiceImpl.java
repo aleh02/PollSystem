@@ -91,6 +91,7 @@ public class PollServiceImpl implements PollService {
         poll.setStatus(PollStatus.ACTIVE);
         poll.setWinnerOption(null);
         poll.setWinnerPercent(null);
+        poll.setWinnerNotifiedAt(null);
 
         Poll savedPoll = pollRepository.save(poll);
         return pollMapper.pollToPollResponse(savedPoll);

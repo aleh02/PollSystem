@@ -1,7 +1,6 @@
 package it.alessandrohan.pollsystem.repository;
 
 import it.alessandrohan.pollsystem.model.Poll;
-import it.alessandrohan.pollsystem.model.PollStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -57,7 +56,7 @@ public interface PollRepository extends JpaRepository<Poll, Long> {
     int expireIfActiveAndDue(@Param("pollId") Long pollId);
 
     @Query(value = """
-                SELECT id
+            SELECT id
             FROM polls
             WHERE status = 'EXPIRED'
               AND winner_notified_at IS NULL

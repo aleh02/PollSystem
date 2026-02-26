@@ -53,7 +53,12 @@ public class PollNotificationService {
     }
 
     protected void markNotified(Long pollId) {
-        transactionTemplate.executeWithoutResult(status -> pollRepository.markWinnerNotified(pollId));
+        transactionTemplate.executeWithoutResult(status -> {
+            int updated = pollRepository.markWinnerNotified(pollId);
+            if (updated == 0) {
+                log.debug("Poll {} was already marked as notified", pollId);
+            }
+        });
     }
 
     private int notifyOne(Long pollId) {
