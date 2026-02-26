@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
@@ -106,6 +107,7 @@ public class PollServiceImpl implements PollService {
     }
 
     @Override
+    @Transactional
     public PollResponse updatePoll(Long id, AuthPrincipal me, PollUpdateRequest request) {
         if (request.getQuestion() == null && request.getExpiresAt() == null) {
             throw new IllegalArgumentException("question or expiration time not valid");
@@ -138,6 +140,7 @@ public class PollServiceImpl implements PollService {
     }
 
     @Override
+    @Transactional
     public void deletePoll(Long id, AuthPrincipal me) {
         Poll poll = pollRepository.findWithOwnerById(id)
                 .orElseThrow(() -> new NotFoundException("poll not found"));

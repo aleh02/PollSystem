@@ -15,6 +15,7 @@ import it.alessandrohan.pollsystem.web.exception.BadRequestException;
 import it.alessandrohan.pollsystem.web.exception.UnauthorizedOperationException;
 import it.alessandrohan.pollsystem.web.exception.NotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -68,6 +69,7 @@ public class PollOptionServiceImpl implements PollOptionService {
     }
 
     @Override
+    @Transactional
     public PollOptionResponse updatePollOption(
             Long pollId, Long optionId, AuthPrincipal me, PollOptionUpdateRequest request
     ) {
@@ -90,6 +92,7 @@ public class PollOptionServiceImpl implements PollOptionService {
     }
 
     @Override
+    @Transactional
     public void deletePollOption(Long pollId, Long optionId, AuthPrincipal me) {
         PollOption option = pollOptionRepository.findById(optionId)
                 .orElseThrow(() -> new NotFoundException("option not found"));

@@ -27,7 +27,7 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          @NonNull AuthenticationException authException) throws IOException {
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());    //401
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         ValidationErrorResponse body = new ValidationErrorResponse(
