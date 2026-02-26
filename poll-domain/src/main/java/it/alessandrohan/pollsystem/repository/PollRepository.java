@@ -13,6 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PollRepository extends JpaRepository<Poll, Long> {
+    @Override
+    @EntityGraph(attributePaths = "owner")
+    Page<Poll> findAll(Pageable pageable);
+
+    @EntityGraph(attributePaths = "owner")
     Page<Poll> findByQuestionContainingIgnoreCase(String question, Pageable pageable);
 
     @EntityGraph(attributePaths = "owner")
