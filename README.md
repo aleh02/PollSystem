@@ -64,7 +64,7 @@ Services:
 ### REST service
 
 ```bash
-./mvnw -pl poll-rest-service -am spring-boot:run
+./mvnw -f poll-rest-service/pom.xml spring-boot:run
 ```
 
 - Base URL: `http://localhost:8080/rest/api/v0`
@@ -73,7 +73,7 @@ Services:
 ### Batch service
 
 ```bash
-./mvnw -pl poll-batch-service -am spring-boot:run
+./mvnw -f poll-batch-service/pom.xml spring-boot:run
 ```
 
 - Port: `8081`
@@ -87,7 +87,7 @@ The debug endpoint is available only with `local` profile.
 Run batch with local profile:
 
 ```bash
-./mvnw -pl poll-batch-service -am spring-boot:run -Dspring-boot.run.profiles=local
+./mvnw -f poll-batch-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
 Trigger immediately:
@@ -188,8 +188,8 @@ Cause: running plugin on aggregator POM.
 Use module command instead:
 
 ```bash
-./mvnw -pl poll-rest-service -am spring-boot:run
-./mvnw -pl poll-batch-service -am spring-boot:run
+./mvnw -f poll-rest-service/pom.xml spring-boot:run
+./mvnw -f poll-batch-service/pom.xml spring-boot:run
 ```
 
 ### `Could not find artifact ... poll-domain`

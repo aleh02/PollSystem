@@ -52,8 +52,9 @@ public class PollNotificationService {
         }
     }
 
+    //prevents concurrent double notify
     protected void markNotified(Long pollId) {
-        transactionTemplate.executeWithoutResult(status -> {
+        transactionTemplate.executeWithoutResult(status -> {    //as transaction
             int updated = pollRepository.markWinnerNotified(pollId);
             if (updated == 0) {
                 log.debug("Poll {} was already marked as notified", pollId);
@@ -80,7 +81,7 @@ public class PollNotificationService {
         );
 
         winnerMailProducer.send(msg);
-        markNotified(pollId);   //only if publish success
+        markNotified(pollId);   //only if publish success (at-least-once e2e)
         return 1;
     }
 }

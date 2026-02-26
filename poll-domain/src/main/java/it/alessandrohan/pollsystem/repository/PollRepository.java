@@ -81,6 +81,6 @@ public interface PollRepository extends JpaRepository<Poll, Long> {
             WHERE id = :pollId
                 AND winner_notified_at IS NULL
             """, nativeQuery = true)
-    int markWinnerNotified(@Param("pollId") Long pollId);
+    int markWinnerNotified(@Param("pollId") Long pollId);   //prevents concurrent double mark
 
 }
