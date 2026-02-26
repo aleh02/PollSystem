@@ -1,5 +1,6 @@
-package it.alessandrohan.pollsystem.batch;
+package it.alessandrohan.pollsystem.batch.web;
 
+import it.alessandrohan.pollsystem.batch.scheduler.PollBatchScheduler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PostMapping;

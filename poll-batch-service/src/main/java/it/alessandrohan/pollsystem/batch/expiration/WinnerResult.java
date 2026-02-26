@@ -1,4 +1,4 @@
-package it.alessandrohan.pollsystem.batch;
+package it.alessandrohan.pollsystem.batch.expiration;
 
 import java.math.BigDecimal;
 

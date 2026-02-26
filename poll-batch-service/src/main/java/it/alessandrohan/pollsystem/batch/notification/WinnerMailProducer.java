@@ -1,4 +1,4 @@
-package it.alessandrohan.pollsystem.batch;
+package it.alessandrohan.pollsystem.batch.notification;
 
 import it.alessandrohan.pollsystem.messaging.WinnerMessage;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

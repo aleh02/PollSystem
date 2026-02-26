@@ -1,4 +1,4 @@
-package it.alessandrohan.pollsystem.batch;
+package it.alessandrohan.pollsystem.batch.expiration;
 
 import it.alessandrohan.pollsystem.model.Poll;
 import it.alessandrohan.pollsystem.model.PollOption;
@@ -41,9 +41,8 @@ public class PollExpirationService {
             if (duePollIds.isEmpty()) return expiredCount;
 
             for (Long pollId : duePollIds) {
-                final int[] updated = new int[1];
-                transactionTemplate.executeWithoutResult(status -> updated[0] = expireAndComputeWinner(pollId));
-                expiredCount += updated[0];
+                Integer updated = transactionTemplate.execute(status -> expireAndComputeWinner(pollId));
+                expiredCount += (updated != null ? updated : 0);
             }
 
             if (duePollIds.size() < effectiveLimit) {

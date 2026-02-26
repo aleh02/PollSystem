@@ -1,5 +1,7 @@
-package it.alessandrohan.pollsystem.batch;
+package it.alessandrohan.pollsystem.batch.scheduler;
 
+import it.alessandrohan.pollsystem.batch.expiration.PollExpirationService;
+import it.alessandrohan.pollsystem.batch.notification.PollNotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
